@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anime Style Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* ตั้งค่าพื้นฐานและฟอนต์ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Mali', cursive; /* ฟอนต์น่ารักๆ สไตล์อนิเมะ */
+        }
+
+        /* พื้นหลังสไตล์อนิเมะ */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            /* ใช้รูปภาพพื้นหลังแนวท้องฟ้า/อนิเมะสวยๆ */
+            background-image: url('https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=1920&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        /* กล่องเครื่องคิดเลขแบบ Glassmorphism */
+        .calculator {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 25px;
+            padding: 25px;
+            width: 320px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2), 
+                        inset 0 0 15px rgba(255, 255, 255, 0.5);
+        }
+
+        /* หน้าจอแสดงผล */
+        .display {
+            width: 100%;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: right;
+            padding: 20px;
+            font-size: 2rem;
+            color: #4a4a4a;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            box-shadow: inset 0 4px 6px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        /* ตารางปุ่มกด */
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        /* สไตล์ปุ่มกด */
+        button {
+            height: 60px;
+            border: none;
+            outline: none;
+            border-radius: 15px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #555;
+            background: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        /* เอฟเฟกต์ตอนนำเมาส์ไปวาง */
+        button:hover {
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(255, 182, 193, 0.5); /* เรืองแสงสีชมพูอ่อน */
+            color: #ff758c;
+        }
+
+        /* เอฟเฟกต์ตอนกดปุ่ม */
+        button:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* สีปุ่มพิเศษ (เครื่องหมายต่างๆ) */
+        .operator {
+            background: rgba(255, 182, 193, 0.6); /* สีชมพูพาสเทล */
+            color: #fff;
+        }
+
+        .operator:hover {
+            background: rgba(255, 150, 168, 0.9);
+            color: #fff;
+        }
+
+        /* ปุ่ม Clear และ Delete */
+        .clear-btn {
+            background: rgba(173, 216, 230, 0.6); /* สีฟ้าพาสเทล */
+            color: #fff;
+        }
+
+        .clear-btn:hover {
+            background: rgba(135, 206, 235, 0.9);
+            color: #fff;
+        }
+
+        /* ปุ่มเท่ากับ (ขยาย 2 ช่อง) */
+        .equal {
+            grid-column: span 2;
+            background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 117, 140, 0.4);
+        }
+
+        .equal:hover {
+            background: linear-gradient(135deg, #ff7eb3 0%, #ff758c 100%);
+            color: white;
+            box-shadow: 0 6px 20px rgba(255, 117, 140, 0.6);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="calculator">
+        <div class="display" id="display">0</div>
+        <div class="buttons">
+            <button class="clear-btn" onclick="clearDisplay()">AC</button>
+            <button class="clear-btn" onclick="deleteNumber()">DEL</button>
+            <button class="operator" onclick="appendOperator('%')">%</button>
+            <button class="operator" onclick="appendOperator('/')">÷</button>
+
+            <button onclick="appendNumber('7')">7</button>
+            <button onclick="appendNumber('8')">8</button>
+            <button onclick="appendNumber('9')">9</button>
+            <button class="operator" onclick="appendOperator('*')">×</button>
+
+            <button onclick="appendNumber('4')">4</button>
+            <button onclick="appendNumber('5')">5</button>
+            <button onclick="appendNumber('6')">6</button>
+            <button class="operator" onclick="appendOperator('-')">-</button>
+
+            <button onclick="appendNumber('1')">1</button>
+            <button onclick="appendNumber('2')">2</button>
+            <button onclick="appendNumber('3')">3</button>
+            <button class="operator" onclick="appendOperator('+')">+</button>
+
+            <button onclick="appendNumber('0')">0</button>
+            <button onclick="appendNumber('.')">.</button>
+            <button class="equal" onclick="calculate()">=</button>
+        </div>
+    </div>
+
+    <script>
+        const display = document.getElementById('display');
+        let currentInput = '';
+
+        // เพิ่มตัวเลข
+        function appendNumber(number) {
+            if (display.innerText === '0' && number !== '.') {
+                display.innerText = number;
+            } else {
+                display.innerText += number;
+            }
+        }
+
+        // เพิ่มเครื่องหมาย
+        function appendOperator(operator) {
+            const lastChar = display.innerText.slice(-1);
+            if (['+', '-', '*', '/', '%'].includes(lastChar)) {
+                // ถ้าเครื่องหมายซ้ำ ให้เปลี่ยนเป็นอันใหม่
+                display.innerText = display.innerText.slice(0, -1) + operator;
+            } else {
+                display.innerText += operator;
+            }
+        }
+
+        // เคลียร์หน้าจอ (AC)
+        function clearDisplay() {
+            display.innerText = '0';
+        }
+
+        // ลบทีละตัว (DEL)
+        function deleteNumber() {
+            if (display.innerText.length === 1) {
+                display.innerText = '0';
+            } else {
+                display.innerText = display.innerText.slice(0, -1);
+            }
+        }
+
+        // คำนวณผลลัพธ์
+        function calculate() {
+            try {
+                // ใช้ Function แทน eval เพื่อความปลอดภัยที่ดีกว่าเล็กน้อยในหน้าเว็บพื้นฐาน
+                let expression = display.innerText.replace(/×/g, '*').replace(/÷/g, '/');
+                let result = new Function('return ' + expression)();
+                
+                // ตรวจสอบทศนิยมไม่ให้ยาวเกินไป
+                if (!Number.isInteger(result)) {
+                    result = parseFloat(result.toFixed(5));
+                }
+                
+                display.innerText = result;
+            } catch (error) {
+                display.innerText = 'Error';
+                setTimeout(clearDisplay, 1500);
+            }
+        }
+    </script>
+</body>
+</html>
